@@ -8,17 +8,26 @@ import numpy as np
 # 如果显存不足，可以尝试 8-bit 量化 (需安装 bitsandbytes)
 print("Loading model...")
 processor = AutoProcessor.from_pretrained("openvla/openvla-7b", trust_remote_code=True)
+# vla = AutoModelForVision2Seq.from_pretrained(
+#     "openvla/openvla-7b", 
+#     attn_implementation="flash_attention_2",  # 如果已安装 flash_attn，推荐开启
+#     torch_dtype=torch.bfloat16, 
+#     low_cpu_mem_usage=True, 
+#     trust_remote_code=True
+# ).to("cuda:0")
+
 vla = AutoModelForVision2Seq.from_pretrained(
     "openvla/openvla-7b", 
-    attn_implementation="flash_attention_2",  # 如果已安装 flash_attn，推荐开启
+    # attn_implementation="flash_attention_2",  # 如果已安装 flash_attn，推荐开启
     torch_dtype=torch.bfloat16, 
     low_cpu_mem_usage=True, 
     trust_remote_code=True
 ).to("cuda:0")
 
 # 2. 准备输入
-# 这里我们创建一个假的随机图片作为演示，实际使用请替换为真实相机图片
-image = Image.fromarray(np.random.randint(0, 255, (256, 256, 3), dtype=np.uint8))
+# 读取真实图片 (确保 'coke_can_real.jpg' 在当前目录下)
+print("Loading image...")
+image = Image.open("coke_can_real.jpg").convert("RGB")
 instruction = "pick up the coke can"
 
 # 构建 Prompt
